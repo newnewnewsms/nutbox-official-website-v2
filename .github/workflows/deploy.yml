@@ -14,7 +14,7 @@ jobs:
         uses: crustio/ipfs-upload-action@v1.0.2
         id: uploadsite
         with:
-          path: './build'
+          path: './'
           crust-secret-key: ${{ secrets.CRUST_SECRET_KEY }}
       
       - name: Pin to Crust
