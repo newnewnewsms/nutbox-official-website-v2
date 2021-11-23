@@ -3,8 +3,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  create_release:
-    name: Create Release
+  deploy_on_crust:
+    name: Deploy on Crust
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
