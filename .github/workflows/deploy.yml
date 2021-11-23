@@ -3,39 +3,37 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy_on_crust:
-    name: Deploy on Crust
+  deploy_ipfs:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      - name: Set up node
-        uses: actions/setup-node@v2
+      - uses: actions/setup-node@v2
         with:
-          node-version: 14
-          registry-url: https://registry.npmjs.org
+          node-version: '14'
+          cache: 'npm'
 
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
+      - name: install
+        run: npm ci
 
-      - name: Build the IPFS bundle
-        run: yarn build
+      - name: prepare env
+        run: cp ${ENV:-'.github/.env.staging'} .env
 
-      - name: Pin to IPFS
-        id: upload
-        uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
-        with:
-          pin-name: Nutbox UI
-          path: './build'
-          pinata-api-key: ${{ secrets.PINATA_API_KEY }}
-          pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
+      - name: build
+        run: npm run build
 
-      - name: Pin to Crust
-        uses: crustio/ipfs-crust-action@v2.0.3
+      - name: pinata
+        id: pinata
+        env:
+          PINATA_API_KEY: ${{ secrets.PINATA_API_KEY }}
+          PINATA_SECRET_KEY: ${{ secrets.PINATA_SECRET_KEY }}
+          PIN_ALIAS: staging
+        run: node scripts/pin-pinata.js
+
+      - name: crust
+        uses: crustio/ipfs-crust-action@f51bf12d352d230e12bfd8fa00b07f1f6c7aa735
         continue-on-error: true
         timeout-minutes: 2
         with:
-          cid: ${{ steps.upload.outputs.hash }}
+          cid: ${{ steps.pinata.outputs.hash }}
           seeds: ${{ secrets.CRUST_SEEDS }}
-  
