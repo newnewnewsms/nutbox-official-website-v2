@@ -24,9 +24,10 @@ jobs:
 
       - name: Pin to IPFS
         id: upload
-        uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.4
+        uses: anantaramdas/ipfs-pinata-deploy-action@v1.6.3
         with:
           pin-name: Nutbox UI
+          path: './build'
           pinata-api-key: ${{ secrets.PINATA_API_KEY }}
           pinata-secret-api-key: ${{ secrets.PINATA_API_SECRET_KEY }}
 
